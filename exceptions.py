@@ -26,3 +26,8 @@ class FormatError(Exception):
 class DataTypeError(Exception):
     """Неправильный тип данных"""
     pass
+
+
+class StatusCodeError(Exception):
+    """Ошибка возникает, если status_code != 200."""
+    pass
