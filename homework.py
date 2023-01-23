@@ -64,7 +64,7 @@ def get_api_answer(timestamp):
     try:
         homework = requests.get(**request_params)
         if homework.status_code != HTTPStatus.OK:
-            raise exceptions.StatusCodeError("Ожидаемый код ответа сервера не получен")
+            raise exceptions.StatusCodeError("Ожидаемый код ответа не получен")
     except Exception:
         raise exceptions.PracticumAPIError("Ошибка при запросе к серверу")
     else:
