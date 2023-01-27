@@ -7,6 +7,7 @@ from typing import Dict
 
 import requests
 import telegram
+
 from dotenv import load_dotenv
 from http import HTTPStatus
 
@@ -51,9 +52,10 @@ def send_message(bot, message):
     try:
         logging.debug(f'Отправка сообщения {message}')
         bot.send_message(TELEGRAM_CHAT_ID, message)
-    except Exception as error:
-        logging.error(f'Сбой в работе программы: {error}')
-        raise exceptions.SendmessageError(f'Ошибка отправки сообщения{error}')
+    except telegram.error.TelegramError as error:
+        logging.error(f"Ошибка отправки статуса в telegram: {error}")
+    else:
+        logging.info("Успешная отправка сообщения!")
 
 
 def get_api_answer(timestamp):
@@ -76,12 +78,11 @@ def check_response(response):
     logging.info('Начало проверки ответа сервера')
     try:
         homeworks = response['homeworks']
-        value = response['homeworks']
     except KeyError:
         raise KeyError('Нет ключа в словаре')
     if not isinstance(homeworks, list):
         raise TypeError('Не список')
-    if value:
+    if homeworks:
         return response['homeworks'][0]
 
 
@@ -121,7 +122,7 @@ def main():
             if prev_message != message:
                 send_message(bot, message)
             logging.info(homework)
-            current_timestamp = response('current_date')
+            current_timestamp = response.get('current_date')
         except IndexError:
             message = 'Статус работы не изменился'
             if prev_message != message:
@@ -150,8 +151,7 @@ if __name__ == '__main__':
     )
     handler.setFormatter(formatter)
     try:
-        sys.exit(main())
+        main()
     except KeyboardInterrupt:
-        print("остановки работы.")
-        pass
-    main()
+        sys.exit()
+
