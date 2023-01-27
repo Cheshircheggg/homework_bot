@@ -31,3 +31,8 @@ class DataTypeError(Exception):
 class StatusCodeError(Exception):
     """Ошибка возникает, если status_code != 200."""
     pass
+
+
+class KeyNotFound(Exception):
+    """ошибка поиска ключа"""
+    pass
