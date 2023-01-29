@@ -1,7 +1,6 @@
 import logging
 import datetime
 import os
-import sys
 import time
 from http import HTTPStatus
 from logging import StreamHandler
@@ -129,7 +128,7 @@ def main():
                     send_message(bot, message)
                     preview_api_response = current_api_answer
                 logging.info(
-                        'Новое домашнее задание не появилось или не изменилось'
+                            "Новое домашнее задание не появилось или не изменилось"
                 )
         except Exception as error:
             message = f"Сбой в работе программы: {error}"
