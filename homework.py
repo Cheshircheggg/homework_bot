@@ -82,8 +82,7 @@ def check_response(response):
         raise KeyError("Нет ключа в словаре")
     if not isinstance(homeworks, list):
         raise TypeError("Не список")
-    if homeworks:
-        return response["homeworks"][0]
+    return homeworks
 
 
 def parse_status(homework):
@@ -105,37 +104,31 @@ def parse_status(homework):
 
 def main():
     """Основная логика работы бота."""
-    prev_message = ''
     if not check_tokens():
-        raise exceptions.TokenError("Ошибка токена")
+        errormessage = 'Отсутствует обязательная переменная окружения!'
+        logging.critical(errormessage)
+        raise exceptions.TokenError(errormessage)
+
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
-    preview_api_response = None
+    current_error = None
     while True:
         try:
             response = get_api_answer(current_timestamp)
-            homework = check_response(response)
-            message = parse_status(homework)
-            if prev_message != message:
+            home_works = check_response(response)
+            if len(home_works) > 0:
+                message = parse_status(home_works[0])
                 send_message(bot, message)
-            logging.info(homework)
-            current_timestamp = datetime.datetime.now()
-            if not check_response(response):
-                continue
-            if homework:
-                current_api_answer = homework
-                if current_api_answer != preview_api_response:
-                    send_message(bot, message)
-                    preview_api_response = current_api_answer
-                logging.info(
-                    "Новое домашнее задание "
-                    "не появилось или не изменилось")
+            current_timestamp = response.get('current_date', current_timestamp)
         except Exception as error:
-            message = f"Сбой в работе программы: {error}"
-            send_message(bot, message)
-            logging.error(message)
+            errormessage = f'Сбой в работе программы: {error}'
+            logging.critical(errormessage)
+            if current_error != errormessage:
+                current_error = errormessage
+                send_message(bot, errormessage)
+        else:
+            current_error = None
         finally:
-            prev_message = message
             time.sleep(RETRY_PERIOD)
 
 
