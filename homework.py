@@ -1,5 +1,4 @@
 import logging
-import datetime
 import os
 import time
 from http import HTTPStatus
